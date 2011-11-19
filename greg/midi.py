@@ -9,23 +9,84 @@ from time import sleep
 
 device_id = 4
 instrument = 19
-start_note = 53
+anchor_note = 60
 
+BEATS_PER_BAR = 8
+
+chords = {
+  'major': (2,2,1,2,2,2,1),
+}
+
+def generate_next_bar (bar_queue):
+    bar_queue.append(bar_queue[-1])
 
 if __name__ == '__main__':
     pygame.init()
+
+    running = True
+    notes_on = {}
+    clock = pygame.time.Clock()
+
     pygame.midi.init()
     port = device_id
     midi_out = pygame.midi.Output(port, 0)
-    midi_out.set_instrument(instrument)
-    
-    midi_out.note_on(start_note, 127)
+#    midi_out.set_instrument(10,0)
+#    midi_out.set_instrument(20,1)
+    bar_queue = [
+        {
+            1:  [(True, 0), (True, 2), (True, 4), None, (False, 0), (False, 2), (False, 4), None],
 
-    print midi_out
 
-    sleep(1)
-
-    midi_out.note_off(start_note)
-
-    del midi_out
-    pygame.midi.quit()
+            10: [(True, 36), (False, 36), (True, 36), (False, 36), (True, 36), (False, 36), (True, 36), (False, 36)]
+        }
+    ]
+    bar = 0
+    beat = 0
+    current_bar = bar_queue[0]
+    print 'beginning loop', current_bar
+    try:
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    continue
+                elif e.type == pygame.KEYDOWN:
+                    if e.key == pygame.K_ESCAPE:
+                        break
+            print 'iteration', bar, beat
+            for channel in current_bar:
+                #if not isinstance(channel, (int, long)): continue
+                print 'channel', channel
+                current_channel = current_bar[channel]
+                if beat < len(current_channel):
+                    current_beat = current_channel[beat]
+                    print 'has beat', current_beat
+                    if current_beat:
+                        print current_beat[0]
+                        on_off = current_beat[0]
+                        our_note = (0 if channel == 10 else anchor_note) + current_beat[1]
+                        if current_beat[0]:
+                            midi_out.note_on(our_note, 127, channel)
+                            if channel not in notes_on:
+                                notes_on[channel] = set()
+                            notes_on[channel].add(our_note)
+                        else:
+                            midi_out.note_off(our_note, None, channel)
+                            notes_on[channel].remove(our_note)
+            beat += 1
+            if beat >= BEATS_PER_BAR:
+                bar += 1
+                if bar >= len(bar_queue):
+                    print 'Run out of bars!'
+                    generate_next_bar(bar_queue)
+                    #bar_queue.append(generate_next_bar())
+                    #running = False
+                    #continue
+                beat = 0
+                current_bar = bar_queue.pop(0)
+            clock.tick(4)
+    except KeyboardInterrupt:
+        pass
+    print "RAJLRJSHHSJHADHKJASRA"
+    midi_out.abort()
+    midi_out.close()
