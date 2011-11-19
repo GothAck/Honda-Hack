@@ -61,6 +61,8 @@ drum_mode = 0
 
 major_scale_reversed = dict((v,k) for k, v in major_scale.iteritems())
 
+tick_time = 4
+
 def to_relative(note_in):
     note_off = note_in - anchor_note
     note = note_off % 12
@@ -88,6 +90,14 @@ def random_fill():
             fill.append(None)
     return fill
 
+def random_relative_from_chord_root(chord):
+    """
+    When we are playing a chord, only some notes fit in when being backing.
+    Pick a random note in the chord set using chord_relativity
+    """
+    return random.choice(chord_relativity[random.choice(chord_relativity.keys())])
+  
+
 def generate_next_bar (bar_queue, bar_no):
     prev_bar = bar_queue[-1]
     next_bar = copy.deepcopy(prev_bar)
@@ -108,15 +118,23 @@ def generate_next_bar (bar_queue, bar_no):
     #next_bar[2] = [(True,relative_next_chord) for i in range(BEATS_PER_BAR)]
     next_bar[2] = [(True,relative_next_chord)] + [None]*(BEATS_PER_BAR-2) + [(False,relative_next_chord)]
     
+    next_bar[3] = [(True,relative_next_chord)]*BEATS_PER_BAR
+    
     # Mutate line
-    #for i in range(len(next_bar[2])):
-    #    if random.randint(0,4)==0:
-    #      next_bar[2][i] = (True, next_bar[2][i][1]+(random.randint(0,8)-4))
+    for i in range(len(next_bar[3])):
+        if random.randint(0,4)==0:
+          next_bar[3][i] = (True, random_relative_from_chord_root(next_bar[3][i][1]))
     
     print next_bar
     
     
     print "--------------------------------------------------"
+    
+    if not bar_no % 8:
+      global anchor_note
+      anchor_note += random.randint(-4,4)
+      #global tick_time
+      #tick_time   += 1
     
     bar_queue.append(next_bar)
 
@@ -133,7 +151,7 @@ if __name__ == '__main__':
     port = device_id
     midi_out = pygame.midi.Output(port, 0)
     midi_out.set_instrument(50,2)
-#    midi_out.set_instrument(20,1)
+    midi_out.set_instrument(36,3)
     bar_queue = [
         {
             #1:  [(True, 2, 'major'), (True, 0), (True, 4), None, (False, 2), (False, 0), (False, 4), None],
@@ -196,7 +214,7 @@ if __name__ == '__main__':
                     #continue
                 beat = 0
                 current_bar = bar_queue.pop(0)
-            clock.tick(4)
+            clock.tick(tick_time)
     except KeyboardInterrupt:
         pass
     for channel in notes_on:
