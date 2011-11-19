@@ -44,7 +44,7 @@ def to_relative(note):
 def from_relative(note):
   n = major_scale_reversed.get(note % len(major_scale))
   if n:
-    return anchor_note + n
+    return (anchor_note + n) + (n/len(major_scale))*12
   return None # This should never happen
 
 
