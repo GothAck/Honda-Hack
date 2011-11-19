@@ -7,7 +7,14 @@ from pygame.locals import *
 
 from time import sleep
 
-device_id = 4
+device_id = 2
+
+try:
+    device_id = int( sys.argv[-1] )
+except:
+    pass
+
+
 instrument = 19
 anchor_note = 60
 
@@ -26,11 +33,30 @@ major_scale = {
   9: 5,
   11: 6,
 }
+major_scale_reversed = dict((v,k) for k, v in major_scale.iteritems())
 
+def to_relative(note_in):
+    note_off = note_in - anchor_note
+    note = note_off % 12
+    offset = note_off / 12 * len(major_scale)
+    major_note = major_scale.get(note)
+    if major_note:
+        return major_note + offset
+    return None
+
+
+def from_relative(note):
+  n = major_scale_reversed.get(note % len(major_scale))
+  if n:
+    return (anchor_note + n) + (n/len(major_scale))*12
+  return None # This should never happen
 
 
 def generate_next_bar (bar_queue):
-    bar_queue.append(bar_queue[-1])
+    prev_bar = bar_queue[-1]
+    
+
+    bar_queue.append(prev_bar)
 
 if __name__ == '__main__':
     pygame.init()
@@ -99,6 +125,7 @@ if __name__ == '__main__':
             clock.tick(4)
     except KeyboardInterrupt:
         pass
+    for channel in notes_on:
+        for note in notes_on[channel]:
+            midi_out.note_off(note, channel)
     print "RAJLRJSHHSJHADHKJASRA"
-    midi_out.abort()
-    midi_out.close()
