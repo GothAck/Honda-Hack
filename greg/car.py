@@ -9,9 +9,11 @@ UDP_PORT=5005
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
 last_known_state = {
-    "speed": 10,
+    "speed": 0.0,
     "gear": 0,
-    "rpm": 60,
+    "rpm": 0,
+    "turn": 0.0,
+    "indicator": "x",
 }
 prev_known_state = {}
 

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys
 import os
 import random
@@ -9,6 +11,7 @@ from pygame.locals import *
 from time import sleep
 
 import copy
+from car import get_car_change
 
 device_id = 2
 
@@ -79,7 +82,7 @@ def from_relative(note):
 def random_fill():
     drums = drum_modes[drum_mode]
     fill = []
-    for i in range(BEATS_PER_BAR):
+    for i in range(4):
         drum = random.choice(drums + [None])
         if drum:
             fill.append((True, drum))
@@ -99,11 +102,14 @@ def generate_next_bar (bar_queue, bar_no):
     prev_bar = bar_queue[-1]
     next_bar = copy.deepcopy(prev_bar)
 
+    car_old, car_stats, car_stats_change = get_car_change()
+
     if not bar_no % 4:
         print "RANDOM FILL TIME!"
-        #bar_queue.append( {9: random_fill()});
+        bar_queue.append( {9: random_fill(), 'length':4});
 
     print "--------------------------------------------------"
+    print "Generating new bar using: %s (%s)" % (car_stats, car_stats_change)
     
     # Increment the prgression
     chord_progression, chord_progression_index = next_bar['progression']
@@ -136,14 +142,23 @@ def generate_next_bar (bar_queue, bar_no):
     bar_queue.append(next_bar)
 
 
+def handle_events():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            return False
+        elif e.type == pygame.KEYDOWN:
+            if e.key == pygame.K_ESCAPE:
+                return False
+    return True
+
+
 def main(argv):
     pygame.init()
+    pygame.midi.init()
 
-    running = True
     notes_on = {}
     clock = pygame.time.Clock()
 
-    pygame.midi.init()
     midi_out = pygame.midi.Output(device_id, 0)
     midi_out.set_instrument(50,2)
     midi_out.set_instrument(36,3)
@@ -158,14 +173,9 @@ def main(argv):
     beat = 0
     current_bar = bar_queue[0]
     try:
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                    continue
-                elif e.type == pygame.KEYDOWN:
-                    if e.key == pygame.K_ESCAPE:
-                        break
+        while True:
+            if not handle_events(): break
+
             print 'iteration', bar, beat, anchor_note
             for channel in current_bar:
                 if not isinstance(channel, (int, long)): continue
@@ -189,13 +199,13 @@ def main(argv):
                                 midi_out.note_off(our_note, None, channel)
                                 notes_on[channel].remove(our_note)
             beat += 1
-            if beat >= BEATS_PER_BAR:
+            if beat >= current_bar.get('length', BEATS_PER_BAR):
                 bar += 1
                 if bar >= len(bar_queue):
                     print 'Run out of bars!'
                     # Right, percussion instuments rarely get note_off called on them, clean up here
                     for note in notes_on[9]:
-                        midi_out.note_off(note, None, channel)
+                        midi_out.note_off(note, None, 9)
                     notes_on[9] = set()
                     generate_next_bar(bar_queue, bar)
                     #bar_queue.append(generate_next_bar())
@@ -206,10 +216,13 @@ def main(argv):
             clock.tick(tick_time)
     except KeyboardInterrupt:
         pass
-    for channel in notes_on:
-        for note in notes_on[channel]:
-            midi_out.note_off(note, channel)
-    midi_out.close()
+    except Exception as e:
+        print e
+    finally:
+        for channel in notes_on:
+            for note in notes_on[channel]:
+                midi_out.note_off(note, channel)
+        midi_out.close()
 
 
 if __name__ == '__main__':
