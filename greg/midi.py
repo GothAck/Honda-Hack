@@ -8,6 +8,8 @@ from pygame.locals import *
 
 from time import sleep
 
+import copy
+
 device_id = 2
 
 try:
@@ -44,7 +46,16 @@ drum_modes = [
     [36, 40, 45, 50, 57]
 ]
 
+
+chord_progressions = [
+    [ 0,-3,-2,-4],
+    [ 0, 1, 3, 4],
+    [ 5, 2, 0, 1],
+    [-2,-3,-4,-3],
+]
+
 drum_mode = 0
+
 
 major_scale_reversed = dict((v,k) for k, v in major_scale.iteritems())
 
@@ -59,10 +70,10 @@ def to_relative(note_in):
 
 
 def from_relative(note):
-  n = major_scale_reversed.get(note % len(major_scale))
-  if n:
-    return (anchor_note + n) + (n/len(major_scale))*12
-  return None # This should never happen
+    n = major_scale_reversed.get(note % len(major_scale))
+    if n:
+      return (anchor_note + n) + (n/len(major_scale))*12
+    return None # This should never happen
 
 def random_fill():
     drums = drum_modes[drum_mode]
@@ -77,12 +88,31 @@ def random_fill():
 
 def generate_next_bar (bar_queue, bar_no):
     prev_bar = bar_queue[-1]
-    
+    next_bar = copy.deepcopy(prev_bar)
+
     if not bar_no % 4:
         print "RANDOM FILL TIME!"
         bar_queue.append( {9: random_fill()});
 
-    bar_queue.append(prev_bar)
+    print "--------------------------------------------------"
+    
+    # Increment the prgression
+    chord_progression, chord_progression_index = next_bar['progression']
+    relative_next_chord = chord_progressions[chord_progression][(chord_progression_index+1)%len(chord_progressions[0])]
+    print "relative_next_chord: %s" % relative_next_chord
+    next_bar['progression'] = (chord_progression, relative_next_chord)
+    
+    #Populate Next bar with note
+    next_bar[2] = [(True,from_relative(relative_next_chord)) for i in range(BEATS_PER_BAR)]
+    
+    print next_bar[2]
+    
+    
+    print "--------------------------------------------------"
+    
+    bar_queue.append(next_bar)
+
+
 
 if __name__ == '__main__':
     pygame.init()
@@ -99,9 +129,8 @@ if __name__ == '__main__':
     bar_queue = [
         {
             1:  [(True, 2, 'major'), (True, 0), (True, 4), None, (False, 2), (False, 0), (False, 4), None],
-
-
-            9:  [(True, 36), (False, 36)] * 8
+            9:  [(True, 36), (False, 36)] * 8,
+            'progression': (0,0),
         }
     ]
     bar = 0
@@ -119,13 +148,14 @@ if __name__ == '__main__':
                         break
             print 'iteration', bar, beat
             for channel in current_bar:
-                #if not isinstance(channel, (int, long)): continue
+                if not isinstance(channel, (int, long)): continue
                 print 'channel', channel
                 current_channel = current_bar[channel]
                 if beat < len(current_channel):
                     current_beat = current_channel[beat]
                     print 'has beat', current_beat
                     if current_beat:
+                        print type(current_beat)
                         print current_beat[0]
                         on_off = current_beat[0]
                         our_notes = [(0 if channel == 9 else anchor_note) + current_beat[1]]
