@@ -136,8 +136,10 @@ def generate_next_bar (bar_queue, bar_no):
     if not bar_no % 8:
       global anchor_note
       anchor_note += random.randint(-4,4)
-      #global tick_time
-      #tick_time   += 1
+      global tick_time
+      tick_time   += 0.5
+      print "tick_time %s" % tick_time
+      
     
     bar_queue.append(next_bar)
 
