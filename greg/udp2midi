@@ -18,9 +18,7 @@ from car import get_car_state, get_car_change
 
 
 def go(beat, st):
-    bpm = 20+int(st["speed"])
     gear = int(st["gear"])
-    #print "bpm", bpm, "fps", bpm/60
 
     # layer 1, beat
     if beat % 4 == 0:
@@ -112,7 +110,7 @@ if __name__ == '__main__':
             old_state, new_state, diff_state = get_car_change()
             print new_state
             go(beat, new_state)
-            bpm = 20+int(new_state["speed"])
+            bpm = int(20+float(new_state["speed"]))
             clock.tick((float(bpm)/60)*4)
             beat = beat + 1
     except KeyboardInterrupt:

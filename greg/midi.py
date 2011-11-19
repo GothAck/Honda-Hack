@@ -139,8 +139,7 @@ def generate_next_bar (bar_queue, bar_no):
     bar_queue.append(next_bar)
 
 
-
-if __name__ == '__main__':
+def main(argv):
     pygame.init()
 
     running = True
@@ -148,8 +147,7 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
 
     pygame.midi.init()
-    port = device_id
-    midi_out = pygame.midi.Output(port, 0)
+    midi_out = pygame.midi.Output(device_id, 0)
     midi_out.set_instrument(50,2)
     midi_out.set_instrument(36,3)
     bar_queue = [
@@ -215,3 +213,7 @@ if __name__ == '__main__':
         for note in notes_on[channel]:
             midi_out.note_off(note, channel)
     midi_out.close()
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))
