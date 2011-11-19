@@ -72,12 +72,9 @@ def to_relative(note_in):
         return major_note + offset
     return None
 
-
 def from_relative(note):
     n = major_scale_reversed.get(note % len(major_scale))
-    if n:
-      return (anchor_note + n) + (n/len(major_scale))*12
-    return None # This should never happen
+    return (anchor_note + n) + (n/len(major_scale))*12
 
 def random_fill():
     drums = drum_modes[drum_mode]
