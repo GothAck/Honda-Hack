@@ -40,7 +40,10 @@ def to_relative(note):
     return major_scale.get(note)
 
 def generate_next_bar (bar_queue):
-    bar_queue.append(bar_queue[-1])
+    prev_bar = bar_queue[-1]
+    
+
+    bar_queue.append(prev_bar)
 
 if __name__ == '__main__':
     pygame.init()
@@ -109,6 +112,7 @@ if __name__ == '__main__':
             clock.tick(4)
     except KeyboardInterrupt:
         pass
+    for channel in notes_on:
+        for note in notes_on[channel]:
+            midi_out.note_off(note, channel)
     print "RAJLRJSHHSJHADHKJASRA"
-    midi_out.abort()
-    midi_out.close()
