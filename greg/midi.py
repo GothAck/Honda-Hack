@@ -17,6 +17,18 @@ chords = {
   'major': (2,2,1,2,2,2,1),
 }
 
+major_scale = {
+  0: 0,
+  2: 1,
+  4: 2,
+  5: 3,
+  7: 4,
+  9: 5,
+  11: 6,
+}
+
+
+
 def generate_next_bar (bar_queue):
     bar_queue.append(bar_queue[-1])
 
@@ -34,7 +46,7 @@ if __name__ == '__main__':
 #    midi_out.set_instrument(20,1)
     bar_queue = [
         {
-            1:  [(True, 0), (True, 2), (True, 4), None, (False, 0), (False, 2), (False, 4), None],
+            1:  [(True, 0, ), (True, 2), (True, 4), None, (False, 0), (False, 2), (False, 4), None],
 
 
             10: [(True, 36), (False, 36), (True, 36), (False, 36), (True, 36), (False, 36), (True, 36), (False, 36)]
