@@ -148,8 +148,7 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
 
     pygame.midi.init()
-    port = device_id
-    midi_out = pygame.midi.Output(port, 0)
+    midi_out = pygame.midi.Output(device_id, 0)
     midi_out.set_instrument(50,2)
     midi_out.set_instrument(36,3)
     bar_queue = [
