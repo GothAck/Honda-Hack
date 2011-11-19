@@ -7,11 +7,9 @@ from pygame.locals import *
 
 from time import sleep
 
-device_id = 2
+device_id = 4
 instrument = 19
 start_note = 53
-
-
 
 
 if __name__ == '__main__':

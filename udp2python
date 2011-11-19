@@ -5,9 +5,13 @@ import os
 
 import pygame
 import pygame.midi
+import pygame.time
 from pygame.locals import *
 
 from time import sleep
+
+device_id = 4
+start_note = 53
 
 
 # network imports
@@ -19,17 +23,20 @@ UDP_IP="127.0.0.1"
 UDP_PORT=5005
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
-last_known_state = None
+last_known_state = {
+    "speed": 10,
+    "gear": 0,
+    "rpm": 60,
+}
 
 # update state if there are updates, return state
 def get_car_state():
-    global last_known_state
     try:
         while True:
             [r, w, x] = select([sock, ], [], [], 0)
             if r:
                 data, addr = sock.recvfrom(1024)
-                last_known_state = dict([e.split("=") for e in data.split(",")])
+                last_known_state.update(dict([e.split("=") for e in data.split(",")]))
             else:
                 break
     except Exception as e:
@@ -37,8 +44,107 @@ def get_car_state():
     return last_known_state
 
 
+def go(beat, st):
+    bpm = 20+int(st["speed"])
+    gear = int(st["gear"])
+    #print "bpm", bpm, "fps", bpm/60
+
+    # layer 1, beat
+    if beat % 4 == 0:
+        midi_out.note_off(start_note+gear, None, 0)
+        if gear > 0:
+            midi_out.note_on (start_note+gear, 127,  0)
+    if beat % 4 == 1:
+        midi_out.note_off(start_note+gear, None, 0)
+        if gear > 0:
+            midi_out.note_on (start_note+gear, 127,  0)
+    if beat % 4 == 2:
+        midi_out.note_off(start_note+gear+5, None, 0)
+        if gear > 0:
+            midi_out.note_on (start_note+gear+5, 127,  0)
+
+    # layer 2, piano
+    if beat % 8 == 0 or beat % 8 == 1:
+        midi_out.note_off(start_note+04, None, 1)
+        midi_out.note_off(start_note+19, None, 1)
+        if gear > 1:
+            midi_out.note_on (start_note+04, 127,  1)
+            midi_out.note_on (start_note+19, 127,  1)
+    if beat % 8 == 2 or beat % 8 == 3:
+        midi_out.note_off(start_note+01, None, 1)
+        midi_out.note_off(start_note+16, None, 1)
+        if gear > 1:
+            midi_out.note_on (start_note+01, 127,  1)
+            midi_out.note_on (start_note+16, 127,  1)
+    if beat % 8 == 4 or beat % 8 == 5:
+        midi_out.note_off(start_note+00, None, 1)
+        midi_out.note_off(start_note+15, None, 1)
+        if gear > 1:
+            midi_out.note_on (start_note+00, 127,  1)
+            midi_out.note_on (start_note+15, 127,  1)
+    if beat % 8 == 6 or beat % 8 == 7:
+        midi_out.note_off(start_note+00, None, 1)
+        midi_out.note_off(start_note+15, None, 1)
+        if gear > 1:
+            midi_out.note_on (start_note+00, 127,  1)
+            midi_out.note_on (start_note+15, 127,  1)
+
+    # layer 3, guitar
+    if beat % 4 == 0:
+        midi_out.note_off(start_note+5, None, 2)
+        midi_out.note_off(start_note+8, None, 2)
+        if gear > 2:
+            midi_out.note_on (start_note+5, 127,  2)
+            midi_out.note_on (start_note+8, 127,  2)
+    if beat % 4 == 1:
+        midi_out.note_off(start_note+2, None, 2)
+        midi_out.note_off(start_note+3, None, 2)
+        if gear > 2:
+            midi_out.note_on (start_note+2, 127,  2)
+            midi_out.note_on (start_note+3, 127,  2)
+    if beat % 4 == 2:
+        midi_out.note_off(start_note+8, None, 2)
+        midi_out.note_off(start_note+7, None, 2)
+        if gear > 2:
+            midi_out.note_on (start_note+8, 127,  2)
+            midi_out.note_on (start_note+7, 127,  2)
+    if beat % 4 == 3:
+        midi_out.note_off(start_note+4, None, 2)
+        midi_out.note_off(start_note+1, None, 2)
+        if gear > 2:
+            midi_out.note_on (start_note+4, 127,  2)
+            midi_out.note_on (start_note+1, 127,  2)
+
 if __name__ == '__main__':
-    while True:
-        print "Tick"
-        print get_car_state()
-        sleep(0.5)
+    midi_out = None
+    try:
+        pygame.init()
+        pygame.midi.init()
+        port = device_id
+        midi_out = pygame.midi.Output(port, 0)
+        midi_out.set_instrument(115, 0) # basic beat
+        midi_out.set_instrument(1, 1)   # piano
+        midi_out.set_instrument(26, 2)  # guitar
+        clock = pygame.time.Clock()
+        beat = 0
+        while True:
+            st = get_car_state()
+            if st:
+                print st
+                go(beat, st)
+                bpm = 20+int(st["speed"])
+                clock.tick((float(bpm)/60)*4)
+                beat = beat + 1
+            else:  # wait for the data stream to start
+                sleep(0.1)
+
+    except KeyboardInterrupt:
+        print "Interrupted"
+        pass
+    except Exception as e:
+        print e
+    finally:
+        if midi_out:
+            midi_out.abort()
+            midi_out.close()
+        pygame.midi.quit()
