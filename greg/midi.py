@@ -7,7 +7,14 @@ from pygame.locals import *
 
 from time import sleep
 
-device_id = 4
+device_id = 2
+
+try:
+    device_id = int( sys.argv[-1] )
+except:
+    pass
+
+
 instrument = 19
 anchor_note = 60
 
