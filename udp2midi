@@ -13,35 +13,8 @@ from time import sleep
 device_id = 4
 start_note = 53
 
+from car import get_car_state, get_car_change
 
-# network imports
-import socket
-from select import select
-
-# network setup
-UDP_IP="127.0.0.1"
-UDP_PORT=5005
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind((UDP_IP, UDP_PORT))
-last_known_state = {
-    "speed": 10,
-    "gear": 0,
-    "rpm": 60,
-}
-
-# update state if there are updates, return state
-def get_car_state():
-    try:
-        while True:
-            [r, w, x] = select([sock, ], [], [], 0)
-            if r:
-                data, addr = sock.recvfrom(1024)
-                last_known_state.update(dict([e.split("=") for e in data.split(",")]))
-            else:
-                break
-    except Exception as e:
-        print "Fail at getting state", e
-    return last_known_state
 
 
 def go(beat, st):
@@ -115,6 +88,7 @@ def go(beat, st):
             midi_out.note_on (start_note+4, 127,  2)
             midi_out.note_on (start_note+1, 127,  2)
 
+
 if __name__ == '__main__':
     midi_out = None
     try:
@@ -128,16 +102,12 @@ if __name__ == '__main__':
         clock = pygame.time.Clock()
         beat = 0
         while True:
-            st = get_car_state()
-            if st:
-                print st
-                go(beat, st)
-                bpm = 20+int(st["speed"])
-                clock.tick((float(bpm)/60)*4)
-                beat = beat + 1
-            else:  # wait for the data stream to start
-                sleep(0.1)
-
+            old_state, new_state, diff_state = get_car_change()
+            print new_state
+            go(beat, new_state)
+            bpm = 20+int(new_state["speed"])
+            clock.tick((float(bpm)/60)*4)
+            beat = beat + 1
     except KeyboardInterrupt:
         print "Interrupted"
         pass
@@ -145,6 +115,7 @@ if __name__ == '__main__':
         print e
     finally:
         if midi_out:
-            midi_out.abort()
+            #midi_out.abort()  # not implemented
             midi_out.close()
         pygame.midi.quit()
+        pygame.quit()
