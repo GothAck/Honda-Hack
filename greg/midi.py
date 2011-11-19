@@ -27,7 +27,10 @@ major_scale = {
   11: 6,
 }
 
-
+def to_relative(note):
+    note = note - anchor_note
+    note = note % 12
+    return major_scale.get(note)
 
 def generate_next_bar (bar_queue):
     bar_queue.append(bar_queue[-1])
