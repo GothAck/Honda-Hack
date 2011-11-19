@@ -7,7 +7,7 @@ from pygame.locals import *
 
 from time import sleep
 
-device_id = 2
+device_id = 4
 instrument = 19
 anchor_note = 60
 
@@ -31,8 +31,6 @@ major_scale = {
 
 def generate_next_bar (bar_queue):
     bar_queue.append(bar_queue[-1])
-
-
 
 if __name__ == '__main__':
     pygame.init()
