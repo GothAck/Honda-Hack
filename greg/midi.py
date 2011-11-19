@@ -38,8 +38,10 @@ major_scale = {
 }
 
 chord_relativity = {
-  'major': [2, 4],
-  'power': [4, 7]
+  'major': [ 2, 4],
+  'power': [ 4, 7],
+  'inv1' : [-3,-5],
+  'inv2' : [-3, 2],
 }
 
 drum_modes = [
@@ -103,7 +105,13 @@ def generate_next_bar (bar_queue, bar_no):
     next_bar['progression'] = (chord_progression, relative_next_chord)
     
     #Populate Next bar with note
-    next_bar[2] = [(True,relative_next_chord) for i in range(BEATS_PER_BAR)]
+    #next_bar[2] = [(True,relative_next_chord) for i in range(BEATS_PER_BAR)]
+    next_bar[2] = [(True,relative_next_chord)] + [None]*(BEATS_PER_BAR-2) + [(False,relative_next_chord)]
+    
+    # Mutate line
+    #for i in range(len(next_bar[2])):
+    #    if random.randint(0,4)==0:
+    #      next_bar[2][i] = (True, next_bar[2][i][1]+(random.randint(0,8)-4))
     
     print next_bar
     
@@ -124,7 +132,7 @@ if __name__ == '__main__':
     pygame.midi.init()
     port = device_id
     midi_out = pygame.midi.Output(port, 0)
-#    midi_out.set_instrument(10,0)
+    midi_out.set_instrument(50,2)
 #    midi_out.set_instrument(20,1)
     bar_queue = [
         {
