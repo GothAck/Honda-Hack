@@ -17,7 +17,6 @@ start_note = 32
 from car import get_car_state, get_car_change
 
 
-
 def go(beat, st):
     bpm = 20+int(st["speed"])
     gear = int(st["gear"])
