@@ -37,7 +37,7 @@ major_scale_reversed = dict((v,k) for k, v in major_scale.iteritems())
 
 def to_relative(note):
     note = note - anchor_note
-    note = note % 12
+    note = note % len(major_scale)
     return major_scale.get(note)
 
 
