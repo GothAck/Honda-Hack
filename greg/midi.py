@@ -104,7 +104,7 @@ def generate_next_bar (bar_queue, bar_no):
 
     if not bar_no % 4:
         print "RANDOM FILL TIME!"
-        bar_queue.append( {9: random_fill()});
+        #bar_queue.append( {9: random_fill()});
 
     print "--------------------------------------------------"
     
@@ -162,7 +162,6 @@ if __name__ == '__main__':
     bar = 0
     beat = 0
     current_bar = bar_queue[0]
-    print 'beginning loop', current_bar
     try:
         while running:
             for event in pygame.event.get():
@@ -172,17 +171,13 @@ if __name__ == '__main__':
                 elif e.type == pygame.KEYDOWN:
                     if e.key == pygame.K_ESCAPE:
                         break
-            print 'iteration', bar, beat
+            print 'iteration', bar, beat, anchor_note
             for channel in current_bar:
                 if not isinstance(channel, (int, long)): continue
-                print 'channel', channel
                 current_channel = current_bar[channel]
                 if beat < len(current_channel):
                     current_beat = current_channel[beat]
-                    print 'has beat', current_beat
                     if current_beat:
-                        print type(current_beat)
-                        print current_beat[0]
                         on_off = current_beat[0]
                         our_notes = [(0 if channel == 9 else anchor_note) + current_beat[1]]
                         if len(current_beat) == 3:
@@ -190,7 +185,6 @@ if __name__ == '__main__':
                             print 'chord!!!'
                             pass
                         for our_note in our_notes:
-                            print '--------------------------------------', our_note, current_beat
                             if current_beat[0]:
                                 midi_out.note_on(our_note, 127, channel)
                                 if channel not in notes_on:
