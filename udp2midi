@@ -11,10 +11,10 @@ from pygame.locals import *
 from time import sleep
 
 device_id = 4
-start_note = 53
+#start_note = 53
+start_note = 32
 
 from car import get_car_state, get_car_change
-
 
 
 def go(beat, st):
@@ -37,30 +37,36 @@ def go(beat, st):
             midi_out.note_on (start_note+gear+5, 127,  0)
 
     # layer 2, piano
-    if beat % 8 == 0 or beat % 8 == 1:
+    if beat % 8 == 0:
         midi_out.note_off(start_note+04, None, 1)
-        midi_out.note_off(start_note+19, None, 1)
-        if gear > 1:
-            midi_out.note_on (start_note+04, 127,  1)
-            midi_out.note_on (start_note+19, 127,  1)
-    if beat % 8 == 2 or beat % 8 == 3:
-        midi_out.note_off(start_note+01, None, 1)
         midi_out.note_off(start_note+16, None, 1)
         if gear > 1:
-            midi_out.note_on (start_note+01, 127,  1)
+            midi_out.note_on (start_note+04, 127,  1)
             midi_out.note_on (start_note+16, 127,  1)
+    if beat % 8 == 1:
+        midi_out.note_off(start_note+ 8, None, 1)
+        midi_out.note_off(start_note+20, None, 1)
+        if gear > 1:
+            midi_out.note_on (start_note+ 8, 127,  1)
+            midi_out.note_on (start_note+20, 127,  1)
+    if beat % 8 == 2 or beat % 8 == 3:
+        midi_out.note_off(start_note+01, None, 1)
+        midi_out.note_off(start_note+13, None, 1)
+        if gear > 1:
+            midi_out.note_on (start_note+01, 127,  1)
+            midi_out.note_on (start_note+13, 127,  1)
     if beat % 8 == 4 or beat % 8 == 5:
         midi_out.note_off(start_note+00, None, 1)
-        midi_out.note_off(start_note+15, None, 1)
+        midi_out.note_off(start_note+12, None, 1)
         if gear > 1:
             midi_out.note_on (start_note+00, 127,  1)
-            midi_out.note_on (start_note+15, 127,  1)
+            midi_out.note_on (start_note+12, 127,  1)
     if beat % 8 == 6 or beat % 8 == 7:
         midi_out.note_off(start_note+00, None, 1)
-        midi_out.note_off(start_note+15, None, 1)
+        midi_out.note_off(start_note+12, None, 1)
         if gear > 1:
             midi_out.note_on (start_note+00, 127,  1)
-            midi_out.note_on (start_note+15, 127,  1)
+            midi_out.note_on (start_note+12, 127,  1)
 
     # layer 3, guitar
     if beat % 4 == 0:
@@ -96,9 +102,10 @@ if __name__ == '__main__':
         pygame.midi.init()
         port = device_id
         midi_out = pygame.midi.Output(port, 0)
-        midi_out.set_instrument(115, 0) # basic beat
-        midi_out.set_instrument(1, 1)   # piano
-        midi_out.set_instrument(26, 2)  # guitar
+        #midi_out.set_instrument(115, 0) # basic beat
+        midi_out.set_instrument(32,  0) # basic beat
+        midi_out.set_instrument(1,   1) # piano
+        midi_out.set_instrument(26,  2) # guitar
         clock = pygame.time.Clock()
         beat = 0
         while True:

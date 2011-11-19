@@ -7,7 +7,14 @@ from pygame.locals import *
 
 from time import sleep
 
-device_id = 4
+device_id = 2
+
+try:
+    device_id = int( sys.argv[-1] )
+except:
+    pass
+
+
 instrument = 19
 anchor_note = 60
 
@@ -28,13 +35,17 @@ major_scale = {
 }
 major_scale_reversed = dict((v,k) for k, v in major_scale.iteritems())
 
+def to_relative(note):
+    note = note - anchor_note
+    note = note % 12
+    return major_scale.get(note)
+
 
 def from_relative(note):
   n = major_scale_reversed.get(note % len(major_scale))
   if n:
     return anchor_note + n
   return None # This should never happen
-  
 
 
 def generate_next_bar (bar_queue):
