@@ -71,7 +71,7 @@ def to_relative(note_in):
     note = note_off % 12
     offset = note_off / 12 * len(major_scale)
     major_note = major_scale.get(note)
-    if major_note:
+    if major_note != None:
         return major_note + offset
     return None
 
