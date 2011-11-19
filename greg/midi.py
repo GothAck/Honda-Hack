@@ -72,7 +72,6 @@ def to_relative(note_in):
         return major_note + offset
     return None
 
-
 def from_relative(note):
     n = major_scale_reversed.get(note % len(major_scale))
     if n:
@@ -82,7 +81,7 @@ def from_relative(note):
 def random_fill():
     drums = drum_modes[drum_mode]
     fill = []
-    for i in range(BEATS_PER_BAR):
+    for i in range(4):
         drum = random.choice(drums + [None])
         if drum:
             fill.append((True, drum))
@@ -104,7 +103,7 @@ def generate_next_bar (bar_queue, bar_no):
 
     if not bar_no % 4:
         print "RANDOM FILL TIME!"
-        #bar_queue.append( {9: random_fill()});
+        bar_queue.append( {9: random_fill(), 'length':4});
 
     print "--------------------------------------------------"
     
@@ -192,13 +191,13 @@ def main(argv):
                                 midi_out.note_off(our_note, None, channel)
                                 notes_on[channel].remove(our_note)
             beat += 1
-            if beat >= BEATS_PER_BAR:
+            if beat >= current_bar.get('length', BEATS_PER_BAR):
                 bar += 1
                 if bar >= len(bar_queue):
                     print 'Run out of bars!'
                     # Right, percussion instuments rarely get note_off called on them, clean up here
                     for note in notes_on[9]:
-                        midi_out.note_off(note, None, channel)
+                        midi_out.note_off(note, None, 9)
                     notes_on[9] = set()
                     generate_next_bar(bar_queue, bar)
                     #bar_queue.append(generate_next_bar())
