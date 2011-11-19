@@ -1,5 +1,6 @@
 import sys
 import os
+import random
 
 import pygame
 import pygame.midi
@@ -38,6 +39,8 @@ drum_modes = [
     [36, 40, 45, 50, 57]
 ]
 
+drum_mode = 0
+
 major_scale_reversed = dict((v,k) for k, v in major_scale.iteritems())
 
 def to_relative(note_in):
@@ -56,13 +59,23 @@ def from_relative(note):
     return (anchor_note + n) + (n/len(major_scale))*12
   return None # This should never happen
 
-def random_fill(stuff):
-    
-    pass    
+def random_fill():
+    drums = drum_modes[drum_mode]
+    fill = []
+    for i in range(BEATS_PER_BAR):
+        drum = random.choice(drums + [None])
+        if drum:
+            fill.append((True, drum))
+        else:
+            fill.append(None)
+    return fill
 
-def generate_next_bar (bar_queue):
+def generate_next_bar (bar_queue, bar_no):
     prev_bar = bar_queue[-1]
     
+    if not bar_no % 4:
+        print "RANDOM FILL TIME!"
+        bar_queue.append( {9: random_fill()});
 
     bar_queue.append(prev_bar)
 
@@ -83,7 +96,7 @@ if __name__ == '__main__':
             1:  [(True, 0, ), (True, 2), (True, 4), None, (False, 0), (False, 2), (False, 4), None],
 
 
-            10: [(True, 36), (False, 36), (True, 36), (False, 36), (True, 36), (False, 36), (True, 36), (False, 36)]
+            9:  [(True, 36), (False, 36)] * 8
         }
     ]
     bar = 0
@@ -110,7 +123,7 @@ if __name__ == '__main__':
                     if current_beat:
                         print current_beat[0]
                         on_off = current_beat[0]
-                        our_note = (0 if channel == 10 else anchor_note) + current_beat[1]
+                        our_note = (0 if channel == 9 else anchor_note) + current_beat[1]
                         if current_beat[0]:
                             midi_out.note_on(our_note, 127, channel)
                             if channel not in notes_on:
@@ -124,7 +137,11 @@ if __name__ == '__main__':
                 bar += 1
                 if bar >= len(bar_queue):
                     print 'Run out of bars!'
-                    generate_next_bar(bar_queue)
+                    # Right, percussion instuments rarely get note_off called on them, clean up here
+                    for note in notes_on[9]:
+                        midi_out.note_off(note, None, channel)
+                    notes_on[9] = set()
+                    generate_next_bar(bar_queue, bar)
                     #bar_queue.append(generate_next_bar())
                     #running = False
                     #continue
@@ -136,4 +153,4 @@ if __name__ == '__main__':
     for channel in notes_on:
         for note in notes_on[channel]:
             midi_out.note_off(note, channel)
-    print "RAJLRJSHHSJHADHKJASRA"
+    midi_out.close()
