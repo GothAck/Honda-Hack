@@ -71,7 +71,7 @@ def to_relative(note_in):
     note = note_off % 12
     offset = note_off / 12 * len(major_scale)
     major_note = major_scale.get(note)
-    if major_note:
+    if major_note != None:
         return major_note + offset
     return None
 
@@ -119,7 +119,7 @@ def generate_next_bar (bar_queue, bar_no):
     
     #Populate Next bar with note
     #next_bar[2] = [(True,relative_next_chord) for i in range(BEATS_PER_BAR)]
-    next_bar[2] = [(True,relative_next_chord)] + [None]*(BEATS_PER_BAR-2) + [(False,relative_next_chord)]
+    next_bar[2] = [(True,relative_next_chord, 'power')] + [None]*(BEATS_PER_BAR-2) + [(False,relative_next_chord, 'power')]
     
     next_bar[3] = [(True,relative_next_chord)]*BEATS_PER_BAR
     
@@ -187,7 +187,9 @@ def main(argv):
                     if current_beat:
                         on_off = current_beat[0]
                         our_notes = [(0 if channel == 9 else anchor_note) + current_beat[1]]
-                        if len(current_beat) == 3:
+                        if len(current_beat) == 3 and current_beat[2] in chord_relativity:
+                            for note_offset in chord_relativity[current_beat[2]]:
+                                our_notes.append(our_notes[0] + note_offset)
                             print 'pppppppppppppppppppppppppppppppppppppppppppppppppppp', to_relative(our_notes[0])
                             print 'chord!!!'
                             pass
