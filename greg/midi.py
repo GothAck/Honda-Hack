@@ -139,8 +139,7 @@ def generate_next_bar (bar_queue, bar_no):
     bar_queue.append(next_bar)
 
 
-
-if __name__ == '__main__':
+def main(argv):
     pygame.init()
 
     running = True
@@ -220,3 +219,7 @@ if __name__ == '__main__':
         for note in notes_on[channel]:
             midi_out.note_off(note, channel)
     midi_out.close()
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))
