@@ -35,6 +35,11 @@ major_scale = {
   11: 6,
 }
 
+chord_relativity = {
+  'major': [2, 4],
+  'power': [4, 7]
+}
+
 drum_modes = [
     [36, 40, 45, 50, 57]
 ]
@@ -93,7 +98,7 @@ if __name__ == '__main__':
 #    midi_out.set_instrument(20,1)
     bar_queue = [
         {
-            1:  [(True, 0, ), (True, 2), (True, 4), None, (False, 0), (False, 2), (False, 4), None],
+            1:  [(True, 2, 'major'), (True, 0), (True, 4), None, (False, 2), (False, 0), (False, 4), None],
 
 
             9:  [(True, 36), (False, 36)] * 8
@@ -123,15 +128,21 @@ if __name__ == '__main__':
                     if current_beat:
                         print current_beat[0]
                         on_off = current_beat[0]
-                        our_note = (0 if channel == 9 else anchor_note) + current_beat[1]
-                        if current_beat[0]:
-                            midi_out.note_on(our_note, 127, channel)
-                            if channel not in notes_on:
-                                notes_on[channel] = set()
-                            notes_on[channel].add(our_note)
-                        else:
-                            midi_out.note_off(our_note, None, channel)
-                            notes_on[channel].remove(our_note)
+                        our_notes = [(0 if channel == 9 else anchor_note) + current_beat[1]]
+                        if len(current_beat) == 3:
+                            print 'pppppppppppppppppppppppppppppppppppppppppppppppppppp', to_relative(our_notes[0])
+                            print 'chord!!!'
+                            pass
+                        for our_note in our_notes:
+                            print '--------------------------------------', our_note, current_beat
+                            if current_beat[0]:
+                                midi_out.note_on(our_note, 127, channel)
+                                if channel not in notes_on:
+                                    notes_on[channel] = set()
+                                notes_on[channel].add(our_note)
+                            else:
+                                midi_out.note_off(our_note, None, channel)
+                                notes_on[channel].remove(our_note)
             beat += 1
             if beat >= BEATS_PER_BAR:
                 bar += 1
