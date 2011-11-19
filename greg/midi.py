@@ -26,7 +26,15 @@ major_scale = {
   9: 5,
   11: 6,
 }
+major_scale_reversed = dict((v,k) for k, v in major_scale.iteritems())
 
+
+def from_relative(note):
+  n = major_scale_reversed.get(note % len(major_scale))
+  if n:
+    return anchor_note + n
+  return None # This should never happen
+  
 
 
 def generate_next_bar (bar_queue):
