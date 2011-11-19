@@ -48,7 +48,7 @@ drum_modes = [
 
 
 chord_progressions = [
-    [ 0,-3,-2,-4],
+    [ 0,-3,-2,-5],
     [ 0, 1, 3, 4],
     [ 5, 2, 0, 1],
     [-2,-3,-4,-3],
@@ -103,9 +103,9 @@ def generate_next_bar (bar_queue, bar_no):
     next_bar['progression'] = (chord_progression, relative_next_chord)
     
     #Populate Next bar with note
-    next_bar[2] = [(True,from_relative(relative_next_chord)) for i in range(BEATS_PER_BAR)]
+    next_bar[2] = [(True,relative_next_chord) for i in range(BEATS_PER_BAR)]
     
-    print next_bar[2]
+    print next_bar
     
     
     print "--------------------------------------------------"
@@ -128,7 +128,7 @@ if __name__ == '__main__':
 #    midi_out.set_instrument(20,1)
     bar_queue = [
         {
-            1:  [(True, 2, 'major'), (True, 0), (True, 4), None, (False, 2), (False, 0), (False, 4), None],
+            #1:  [(True, 2, 'major'), (True, 0), (True, 4), None, (False, 2), (False, 0), (False, 4), None],
             9:  [(True, 36), (False, 36)] * 8,
             'progression': (0,0),
         }
