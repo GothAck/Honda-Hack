@@ -18,7 +18,7 @@ except:
 instrument = 19
 anchor_note = 60
 
-BEATS_PER_BAR = 8
+BEATS_PER_BAR = 16
 
 chords = {
   'major': (2,2,1,2,2,2,1),
@@ -33,6 +33,11 @@ major_scale = {
   9: 5,
   11: 6,
 }
+
+drum_modes = [
+    [36, 40, 45, 50, 57]
+]
+
 major_scale_reversed = dict((v,k) for k, v in major_scale.iteritems())
 
 def to_relative(note_in):
@@ -51,6 +56,9 @@ def from_relative(note):
     return (anchor_note + n) + (n/len(major_scale))*12
   return None # This should never happen
 
+def random_fill(stuff):
+    
+    pass    
 
 def generate_next_bar (bar_queue):
     prev_bar = bar_queue[-1]
