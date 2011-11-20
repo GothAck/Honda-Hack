@@ -60,6 +60,14 @@ chord_progressions = [
     [-2,-3,-4,-3],
 ]
 
+instruments = {
+  0: [2,5,10,17, 94, 95, 103], # Piano
+  2: [41,44,49,52, 62], #Synth
+  3: [32,37,39], # Bass
+  4: [25,28,29,30, 55,56,79], # Lead
+  #5: []
+}
+
 drum_mode = 0
 
 
@@ -100,7 +108,28 @@ def random_relative_from_chord_root(chord):
     Pick a random note in the chord set using chord_relativity
     """
     return random.choice(chord_relativity[random.choice(chord_relativity.keys())])
-  
+
+
+def generate_random_crap():
+    """
+    Generates list of truely random notes (in key)
+    some start, some stop
+    """
+    bar = [None] * BEATS_PER_BAR
+    rand_note = 0
+    i = 0
+    while i < len(bar):
+        if random.random() > 0.5:
+            rand_note = random.randint(rand_note-4,rand_note+4)
+            bar[i] = (True, rand_note)
+            i += random.randint(1,3) # Fill blank space
+            if i >= len(bar):
+                bar[-1] = (False, rand_note)
+            else:
+                bar[i]  = (False, rand_note)
+        i += 1
+    return bar
+    
 
 def generate_next_bar (bar_queue, bar_no):
     prev_bar = bar_queue[-1]
@@ -117,7 +146,7 @@ def generate_next_bar (bar_queue, bar_no):
     
     # Increment the prgression
     chord_progression_id, chord_progression_index = next_bar['progression']
-    print "chord progressions %s:%s" % (chord_progression_id, chord_progression_index)
+    print "chord progressions %s:%s len(%s)" % (chord_progression_id, chord_progression_index, len(chord_progressions[chord_progression_id])-1)
     # Half the time change chord progression
     if chord_progression_index >= len(chord_progressions[chord_progression_id])-1 and random.random()>0.5:
         chord_progression_id = random.randint(0,len(chord_progressions)-1)
@@ -138,6 +167,8 @@ def generate_next_bar (bar_queue, bar_no):
     for i in range(len(next_bar[3])):
         if random.randint(0,4)==0:
           next_bar[3][i] = (True, random_relative_from_chord_root(next_bar[3][i][1]))
+          
+    next_bar[4] = generate_random_crap()
     
     if not bar_no % 8:
         pass
@@ -171,6 +202,7 @@ def main(argv):
     midi_out = pygame.midi.Output(device_id, 0)
     midi_out.set_instrument(50,2)
     midi_out.set_instrument(36,3)
+    midi_out.set_instrument(81,4)
     bar_queue = [
         {
             #1:  [(True, 2, 'major'), (True, 0), (True, 4), None, (False, 2), (False, 0), (False, 4), None],
