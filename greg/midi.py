@@ -82,11 +82,14 @@ def from_relative(note):
 def random_fill():
     drums = drum_modes[drum_mode]
     fill = []
-    for i in range(4):
+    for i in range(8):
         drum = random.choice(drums + [None])
         if drum:
             fill.append((True, drum))
+            if random.choice((True, False, False)):
+                fill.append((True, drum))
         else:
+            fill.append(None)
             fill.append(None)
     return fill
 
@@ -106,7 +109,7 @@ def generate_next_bar (bar_queue, bar_no):
 
     if not bar_no % 4:
         print "RANDOM FILL TIME!"
-        bar_queue.append( {9: random_fill(), 'length':4});
+        bar_queue.append( {9: random_fill(), 'length':8});
 
     print "--------------------------------------------------"
     print "Generating new bar using: %s (%s)" % (car_stats, car_stats_change)
@@ -214,7 +217,7 @@ def main(argv):
                     #running = False
                     #continue
                 beat = 0
-                current_bar = bar_queue.pop(0)
+                current_bar = bar_queue[bar]
             clock.tick(tick_time)
     except KeyboardInterrupt:
         pass
