@@ -108,14 +108,21 @@ def generate_next_bar (bar_queue, bar_no):
         print "RANDOM FILL TIME!"
         bar_queue.append( {9: random_fill(), 'length':4});
 
-    print "--------------------------------------------------"
-    print "Generating new bar using: %s (%s)" % (car_stats, car_stats_change)
+    #print "--------------------------------------------------"
+    #print "Generating new bar using: %s (%s)" % (car_stats, car_stats_change)
     
     # Increment the prgression
-    chord_progression, chord_progression_index = next_bar['progression']
-    relative_next_chord = chord_progressions[chord_progression][(chord_progression_index+1)%len(chord_progressions[0])]
-    print "relative_next_chord: %s" % relative_next_chord
-    next_bar['progression'] = (chord_progression, relative_next_chord)
+    chord_progression_id, chord_progression_index = next_bar['progression']
+    print "chord progressions %s:%s" % (chord_progression_id, chord_progression_index)
+    # Half the time change chord progression
+    if chord_progression_index >= len(chord_progressions[chord_progression_id])-1 and random.random()>0.5:
+        chord_progression_id = random.randint(0,len(chord_progressions)-1)
+        print "changing chord progression to %s" % chord_progression_id
+    chord_progression            = chord_progressions[chord_progression_id]
+    next_chord_progression_index = (chord_progression_index+1) % len(chord_progressions[chord_progression_id])
+    next_bar['progression'] = (chord_progression_id, next_chord_progression_index)
+    
+    relative_next_chord = chord_progressions[chord_progression_id][next_chord_progression_index]
     
     #Populate Next bar with note
     #next_bar[2] = [(True,relative_next_chord) for i in range(BEATS_PER_BAR)]
@@ -128,17 +135,13 @@ def generate_next_bar (bar_queue, bar_no):
         if random.randint(0,4)==0:
           next_bar[3][i] = (True, random_relative_from_chord_root(next_bar[3][i][1]))
     
-    print next_bar
-    
-    
-    print "--------------------------------------------------"
-    
     if not bar_no % 8:
-      global anchor_note
-      anchor_note += random.randint(-4,4)
-      global tick_time
-      tick_time   += 0.5
-      print "tick_time %s" % tick_time
+        pass
+      #global anchor_note
+      #anchor_note += random.randint(-4,4)
+      #global tick_time
+      #tick_time   += 0.5
+      #print "tick_time %s" % tick_time
       
     
     bar_queue.append(next_bar)
