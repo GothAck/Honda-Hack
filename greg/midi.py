@@ -142,14 +142,14 @@ def generate_drum_beats (speed, prev_beats):
         speed = 0 - speed
     new_beats = []
     for i in range(BEATS_PER_BAR):
-        rand = random.choice([False] + ([True] * int(speed / 20)))
+        rand = random.choice([False] + ([True] * int(float(speed) / 20)))
         if rand:
             new_beats.append((True, random.choice(drums)))
         else:
             new_beats.append(None)
     if prev_beats:
         for i in range(BEATS_PER_BAR):
-            rand = random.choice([False] + ([True] * int(speed / 20)))
+            rand = random.choice([False] + ([True] * int(float(speed) / 20)))
         if not rand:
             new_beats[i] = prev_beats[i]
     return new_beats
@@ -162,7 +162,7 @@ def generate_next_bar (bar_queue, bar_no):
     
     print car_stats_change
     
-    gear = int(car_stats.get('gear',0))
+    gear = int(float(car_stats.get('gear',0)))
     
     if 'gear' in car_stats_change:
         print "RANDOM FILL TIME! GEar change!!!"
@@ -172,7 +172,7 @@ def generate_next_bar (bar_queue, bar_no):
     # Tempo based on speed
     if 'speed' in car_stats:
         global tick_time
-        tick_time = 3 + (int(car_stats['speed'])/float(15))
+        tick_time = 3 + (int(float(car_stats['speed']))/float(15))
         next_bar[9] = generate_drum_beats(tick_time*5, next_bar[9])
 
     # Instrument change based on Indicators
@@ -270,7 +270,7 @@ def main(argv):
         while True:
             if not handle_events(): break
 
-            print 'iteration', bar, beat, anchor_note
+#            print 'iteration', bar, beat, anchor_note
             for channel in current_bar:
                 if not isinstance(channel, (int, long)): continue
                 current_channel = current_bar[channel]
@@ -296,7 +296,7 @@ def main(argv):
             if beat >= current_bar.get('length', BEATS_PER_BAR):
                 bar += 1
                 if bar >= len(bar_queue):
-                    print 'Run out of bars!'
+                    #print 'Run out of bars!'
                     # Right, percussion instuments rarely get note_off called on them, clean up here
                     for note in notes_on[9]:
                         midi_out.note_off(note, None, 9)
