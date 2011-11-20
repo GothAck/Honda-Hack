@@ -137,6 +137,9 @@ def generate_next_bar (bar_queue, bar_no):
 
     car_old, car_stats, car_stats_change = get_car_change()
     
+    if 'gear' in car_stats:
+        car_stats['gear'] = int(car_stats['gear'])
+    
     if 'gear' in car_stats_change:
         print "RANDOM FILL TIME! GEar change!!!"
         bar_queue.append( {9: random_fill(), 'length':8});
@@ -144,7 +147,7 @@ def generate_next_bar (bar_queue, bar_no):
         
     if 'speed' in car_stats_change:
         global tick_time
-        tick_time = 3 + (car_stats_change/30)
+        tick_time = 3 + (int(car_stats_change['speed'])/float(30))
         
 
     #print "--------------------------------------------------"
@@ -169,7 +172,8 @@ def generate_next_bar (bar_queue, bar_no):
     if car_stats.get('gear') >= 2:
         next_bar[2] = [(True,relative_next_chord, 'power')] + [None]*(BEATS_PER_BAR-2) + [(False,relative_next_chord, 'power')]
     else:
-        next_bar[2] == None
+        try: del next_bar[2]
+        except: pass
     
     # Bass
     if car_stats.get('gear') >= 3:
@@ -179,13 +183,15 @@ def generate_next_bar (bar_queue, bar_no):
             if random.randint(0,4)==0:
               next_bar[3][i] = (True, random_relative_from_chord_root(next_bar[3][i][1]))
     else:
-        next_bar[3] = None
+        try: del next_bar[3]
+        except: pass
     
     # Lead
     if car_stats.get('gear') >= 4:
         next_bar[4] = generate_random_crap()
     else:
-        next_bar[4] = None
+        try: del next_bar[4]
+        except: pass
     
     if not bar_no % 8:
         pass
