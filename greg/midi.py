@@ -177,7 +177,7 @@ def generate_next_bar (bar_queue, bar_no):
 
     # Instrument change based on Indicators
     if car_stats_change.get('indicator'):
-        instrument_channel =  random.choice(instruments.keys())
+        instrument_channel = random.choice(list(set(next_bar) & set(instruments.keys())))
         new_instrument     = random.choice(instruments[instrument_channel])
         print "instrument_change channel:%s instument:%s" % (instrument_channel, new_instrument)
         global midi_out
