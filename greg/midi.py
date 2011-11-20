@@ -69,7 +69,7 @@ instruments = {
   #5: []
 }
 
-drum_mode = 1
+drum_mode = 0
 
 
 major_scale_reversed = dict((v,k) for k, v in major_scale.iteritems())
@@ -131,6 +131,23 @@ def generate_random_crap():
         i += 1
     return bar
     
+def generate_drum_beats (speed, prev_beats):
+    drums = drum_modes[drum_mode]
+    if speed < 0:
+        speed = 0 - speed
+    new_beats = []
+    for i in range(BEATS_PER_BAR):
+        rand = random.choice([False] + ([True] * int(speed / 20)))
+        if rand:
+            new_beats.append((True, random.choice(drums)))
+        else:
+            new_beats.append(None)
+    if prev_beats:
+        for i in range(BEATS_PER_BAR):
+            rand = random.choice([False] + ([True] * int(speed / 20)))
+        if not rand:
+            new_beats[i] = prev_beats[i]
+    return new_beats
 
 def generate_next_bar (bar_queue, bar_no):
     prev_bar = bar_queue[-1]
@@ -149,7 +166,7 @@ def generate_next_bar (bar_queue, bar_no):
     if 'speed' in car_stats_change:
         global tick_time
         tick_time = 3 + (int(car_stats_change['speed'])/float(30))
-        
+        next_bar[9] = generate_drum_beats(tick_time*10, next_bar[9])
 
     #print "--------------------------------------------------"
     #print "Generating new bar using: %s (%s)" % (car_stats, car_stats_change)
