@@ -49,7 +49,8 @@ chord_relativity = {
 }
 
 drum_modes = [
-    [36, 40, 45, 50, 57]
+    [36, 40, 45, 50, 57],
+    [81, 70, 66, 58, 53]
 ]
 
 
@@ -130,6 +131,23 @@ def generate_random_crap():
         i += 1
     return bar
     
+def generate_drum_beats (speed, prev_beats):
+    drums = drum_modes[drum_mode]
+    if speed < 0:
+        speed = 0 - speed
+    new_beats = []
+    for i in range(BEATS_PER_BAR):
+        rand = random.choice([False] + ([True] * int(speed / 20)))
+        if rand:
+            new_beats.append((True, random.choice(drums)))
+        else:
+            new_beats.append(None)
+    if prev_beats:
+        for i in range(BEATS_PER_BAR):
+            rand = random.choice([False] + ([True] * int(speed / 20)))
+        if not rand:
+            new_beats[i] = prev_beats[i]
+    return new_beats
 
 def generate_next_bar (bar_queue, bar_no):
     prev_bar = bar_queue[-1]
@@ -139,8 +157,7 @@ def generate_next_bar (bar_queue, bar_no):
     
     print car_stats_change
     
-    if 'gear' in car_stats:
-        car_stats['gear'] = int(car_stats['gear'])
+    gear = int(car_stats.get('gear',0))
     
     if 'gear' in car_stats_change:
         print "RANDOM FILL TIME! GEar change!!!"
@@ -150,7 +167,7 @@ def generate_next_bar (bar_queue, bar_no):
     if 'speed' in car_stats_change:
         global tick_time
         tick_time = 3 + (int(car_stats_change['speed'])/float(30))
-        
+        next_bar[9] = generate_drum_beats(tick_time*10, next_bar[9])
 
     #print "--------------------------------------------------"
     #print "Generating new bar using: %s (%s)" % (car_stats, car_stats_change)
@@ -171,14 +188,14 @@ def generate_next_bar (bar_queue, bar_no):
     #Populate Next bar with note
     
     # Chords
-    if car_stats.get('gear') >= 2:
+    if gear >= 2:
         next_bar[2] = [(True,relative_next_chord, 'power')] + [None]*(BEATS_PER_BAR-2) + [(False,relative_next_chord, 'power')]
     else:
         try: del next_bar[2]
         except: pass
     
     # Bass
-    if car_stats.get('gear') >= 3:
+    if gear >= 3:
         next_bar[3] = [(True,relative_next_chord)]*BEATS_PER_BAR
         # Mutate line
         for i in range(len(next_bar[3])):
@@ -189,7 +206,7 @@ def generate_next_bar (bar_queue, bar_no):
         except: pass
     
     # Lead
-    if car_stats.get('gear') >= 4:
+    if gear >= 4:
         next_bar[4] = generate_random_crap()
     else:
         try: del next_bar[4]
