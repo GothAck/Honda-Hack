@@ -191,9 +191,6 @@ def main(argv):
                         if len(current_beat) == 3 and current_beat[2] in chord_relativity:
                             for note_offset in chord_relativity[current_beat[2]]:
                                 our_notes.append(our_notes[0] + note_offset)
-                            print 'pppppppppppppppppppppppppppppppppppppppppppppppppppp', to_relative(our_notes[0])
-                            print 'chord!!!'
-                            pass
                         for our_note in our_notes:
                             if current_beat[0]:
                                 midi_out.note_on(our_note, 127, channel)
