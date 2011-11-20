@@ -12,6 +12,7 @@ from time import sleep
 
 import copy
 from car import get_car_change
+import traceback
 
 device_id = 2
 
@@ -223,6 +224,7 @@ def main(argv):
         pass
     except Exception as e:
         print e
+        traceback.format_exc()
     finally:
         for channel in notes_on:
             for note in notes_on[channel]:
