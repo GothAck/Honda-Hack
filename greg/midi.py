@@ -136,10 +136,16 @@ def generate_next_bar (bar_queue, bar_no):
     next_bar = copy.deepcopy(prev_bar)
 
     car_old, car_stats, car_stats_change = get_car_change()
-
-    if not bar_no % 4:
-        print "RANDOM FILL TIME!"
+    
+    if 'gear' in car_stats_change:
+        print "RANDOM FILL TIME! GEar change!!!"
         bar_queue.append( {9: random_fill(), 'length':8});
+        #int(car_stats_change.get('gear',0))
+        
+    if 'speed' in car_stats_change:
+        global tick_time
+        tick_time = 3 + (car_stats_change/30)
+        
 
     #print "--------------------------------------------------"
     #print "Generating new bar using: %s (%s)" % (car_stats, car_stats_change)
@@ -158,17 +164,28 @@ def generate_next_bar (bar_queue, bar_no):
     relative_next_chord = chord_progressions[chord_progression_id][next_chord_progression_index]
     
     #Populate Next bar with note
-    #next_bar[2] = [(True,relative_next_chord) for i in range(BEATS_PER_BAR)]
-    next_bar[2] = [(True,relative_next_chord, 'power')] + [None]*(BEATS_PER_BAR-2) + [(False,relative_next_chord, 'power')]
     
-    next_bar[3] = [(True,relative_next_chord)]*BEATS_PER_BAR
+    # Chords
+    if car_stats.get('gear') >= 2:
+        next_bar[2] = [(True,relative_next_chord, 'power')] + [None]*(BEATS_PER_BAR-2) + [(False,relative_next_chord, 'power')]
+    else:
+        next_bar[2] == None
     
-    # Mutate line
-    for i in range(len(next_bar[3])):
-        if random.randint(0,4)==0:
-          next_bar[3][i] = (True, random_relative_from_chord_root(next_bar[3][i][1]))
-          
-    next_bar[4] = generate_random_crap()
+    # Bass
+    if car_stats.get('gear') >= 3:
+        next_bar[3] = [(True,relative_next_chord)]*BEATS_PER_BAR
+        # Mutate line
+        for i in range(len(next_bar[3])):
+            if random.randint(0,4)==0:
+              next_bar[3][i] = (True, random_relative_from_chord_root(next_bar[3][i][1]))
+    else:
+        next_bar[3] = None
+    
+    # Lead
+    if car_stats.get('gear') >= 4:
+        next_bar[4] = generate_random_crap()
+    else:
+        next_bar[4] = None
     
     if not bar_no % 8:
         pass
