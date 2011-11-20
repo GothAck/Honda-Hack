@@ -139,8 +139,7 @@ def generate_next_bar (bar_queue, bar_no):
     
     print car_stats_change
     
-    if 'gear' in car_stats:
-        car_stats['gear'] = int(car_stats['gear'])
+    gear = int(car_stats.get('gear',0))
     
     if 'gear' in car_stats_change:
         print "RANDOM FILL TIME! GEar change!!!"
@@ -171,14 +170,14 @@ def generate_next_bar (bar_queue, bar_no):
     #Populate Next bar with note
     
     # Chords
-    if car_stats.get('gear') >= 2:
+    if gear >= 2:
         next_bar[2] = [(True,relative_next_chord, 'power')] + [None]*(BEATS_PER_BAR-2) + [(False,relative_next_chord, 'power')]
     else:
         try: del next_bar[2]
         except: pass
     
     # Bass
-    if car_stats.get('gear') >= 3:
+    if gear >= 3:
         next_bar[3] = [(True,relative_next_chord)]*BEATS_PER_BAR
         # Mutate line
         for i in range(len(next_bar[3])):
@@ -189,7 +188,7 @@ def generate_next_bar (bar_queue, bar_no):
         except: pass
     
     # Lead
-    if car_stats.get('gear') >= 4:
+    if gear >= 4:
         next_bar[4] = generate_random_crap()
     else:
         try: del next_bar[4]
