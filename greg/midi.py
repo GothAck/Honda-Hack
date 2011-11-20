@@ -172,11 +172,7 @@ def generate_next_bar (bar_queue, bar_no):
     # Tempo based on speed
     if 'speed' in car_stats:
         global tick_time
-<<<<<<< HEAD
-        tick_time = 3 + (int(float(car_stats_change['speed']))/float(15))
-=======
-        tick_time = 3 + (int(car_stats['speed'])/float(15))
->>>>>>> 9ec499f90be4ee33460f6f8c865c9abc825f9cca
+        tick_time = 3 + (int(float(car_stats['speed']))/float(15))
         next_bar[9] = generate_drum_beats(tick_time*5, next_bar[9])
 
     # Instrument change based on Indicators
