@@ -137,6 +137,8 @@ def generate_next_bar (bar_queue, bar_no):
 
     car_old, car_stats, car_stats_change = get_car_change()
     
+    print car_stats_change
+    
     if 'gear' in car_stats:
         car_stats['gear'] = int(car_stats['gear'])
     
