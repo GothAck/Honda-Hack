@@ -21,6 +21,11 @@ try:
 except:
     pass
 
+# Init
+pygame.init()
+pygame.midi.init()
+clock = pygame.time.Clock()
+midi_out = pygame.midi.Output(device_id, 0)
 
 instrument = 19
 anchor_note = 60
@@ -163,11 +168,20 @@ def generate_next_bar (bar_queue, bar_no):
         print "RANDOM FILL TIME! GEar change!!!"
         bar_queue.append( {9: random_fill(), 'length':8});
         #int(car_stats_change.get('gear',0))
-        
+    
+    # Tempo based on speed
     if 'speed' in car_stats_change:
         global tick_time
-        tick_time = 3 + (int(float(car_stats_change['speed']))/float(30))
-        next_bar[9] = generate_drum_beats(tick_time*10, next_bar[9])
+        tick_time = 3 + (int(float(car_stats_change['speed']))/float(15))
+        next_bar[9] = generate_drum_beats(tick_time*5, next_bar[9])
+
+    # Instrument change based on Indicators
+    if car_stats_change.get('indicator'):
+        instrument_channel =  random.choice(instruments.keys())
+        new_instrument     = random.choice(instruments[instrument_channel])
+        print "instrument_change channel:%s instument:%s" % (instrument_channel, new_instrument)
+        global midi_out
+        midi_out.set_instrument(new_instrument, instrument_channel)
 
     #print "--------------------------------------------------"
     #print "Generating new bar using: %s (%s)" % (car_stats, car_stats_change)
@@ -235,13 +249,10 @@ def handle_events():
 
 
 def main(argv):
-    pygame.init()
-    pygame.midi.init()
 
     notes_on = {}
-    clock = pygame.time.Clock()
-
-    midi_out = pygame.midi.Output(device_id, 0)
+    
+    
     midi_out.set_instrument(50,2)
     midi_out.set_instrument(36,3)
     midi_out.set_instrument(81,4)
