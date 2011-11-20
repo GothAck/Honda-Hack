@@ -49,7 +49,8 @@ chord_relativity = {
 }
 
 drum_modes = [
-    [36, 40, 45, 50, 57]
+    [36, 40, 45, 50, 57],
+    [81, 70, 66, 58, 53]
 ]
 
 
@@ -68,7 +69,7 @@ instruments = {
   #5: []
 }
 
-drum_mode = 0
+drum_mode = 1
 
 
 major_scale_reversed = dict((v,k) for k, v in major_scale.iteritems())
