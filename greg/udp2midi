@@ -110,8 +110,9 @@ if __name__ == '__main__':
             old_state, new_state, diff_state = get_car_change()
             print new_state
             go(beat, new_state)
-            bpm = int(20+float(new_state["speed"]))
-            clock.tick((float(bpm)/60)*4)
+            bpm = int(20+float(new_state["speed"]))*4
+            #print "bpm", bpm
+            clock.tick((float(bpm)/60))
             beat = beat + 1
     except KeyboardInterrupt:
         print "Interrupted"
