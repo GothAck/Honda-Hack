@@ -254,7 +254,8 @@ def main(argv):
                                 notes_on[channel].add(our_note)
                             else:
                                 midi_out.note_off(our_note, None, channel)
-                                notes_on[channel].remove(our_note)
+                                if our_note in notes_on[channel]:
+                                    notes_on[channel].remove(our_note)
             beat += 1
             if beat >= current_bar.get('length', BEATS_PER_BAR):
                 bar += 1
