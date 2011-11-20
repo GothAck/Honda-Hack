@@ -270,7 +270,7 @@ def main(argv):
         while True:
             if not handle_events(): break
 
-            print 'iteration', bar, beat, anchor_note
+#            print 'iteration', bar, beat, anchor_note
             for channel in current_bar:
                 if not isinstance(channel, (int, long)): continue
                 current_channel = current_bar[channel]
@@ -296,7 +296,7 @@ def main(argv):
             if beat >= current_bar.get('length', BEATS_PER_BAR):
                 bar += 1
                 if bar >= len(bar_queue):
-                    print 'Run out of bars!'
+                    #print 'Run out of bars!'
                     # Right, percussion instuments rarely get note_off called on them, clean up here
                     for note in notes_on[9]:
                         midi_out.note_off(note, None, 9)
