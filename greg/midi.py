@@ -24,6 +24,20 @@ except:
 # Init
 pygame.init()
 pygame.midi.init()
+
+for i in range( pygame.midi.get_count() ):
+    r = pygame.midi.get_device_info(i)
+    (interf, name, input, output, opened) = r
+
+    in_out = ""
+    if input:
+        in_out = "(input)"
+    if output:
+        in_out = "(output)"
+
+    print ("%2i: interface :%s:, name :%s:, opened :%s:  %s" %
+           (i, interf, name, opened, in_out))
+
 clock = pygame.time.Clock()
 midi_out = pygame.midi.Output(device_id, 0)
 
